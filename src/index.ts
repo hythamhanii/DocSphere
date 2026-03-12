@@ -1,21 +1,44 @@
-import dotenv from "dotenv";
+import "dotenv/config";
+import cors from "cors";
+import http from "http";
+import { Env } from "./config/env.config";
+import { HTTPSTATUS } from "./config/http.config";
 import express, { Request, Response } from "express";
 import connectDatabase from "./config/database.config";
+import { asyncHandler } from "./middlewares/asyncHandler.middleware";
+import { errorHandler } from "./middlewares/errorHandler.middleware";
 
-dotenv.config();
+
 
 const app = express();
+const server = http.createServer(app);
+//Socket
 
-app.use(express.json());
+app.use(express.json({ limit: "10MB" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(
+    cors({
+        origin: "*",
+        credentials: true,
+    })
+)
 
-// Example route
-app.get("/", (req: Request, res: Response) => {
-  res.send("Docsphere backend running");
-});
 
-const PORT: number | string = process.env.PORT || 5000;
 
-app.listen(PORT, async () => {
+app.get("/health",
+    asyncHandler(async (req: Request, res: Response) => {
+        res.status(HTTPSTATUS.OK).json({
+            message: "Server is healthy",
+            status: "OK",
+        });
+    })
+);
+
+// app.use("/api", routes);
+
+app.use(errorHandler);
+
+server.listen(Env.PORT, async () => {
     await connectDatabase();
-  console.log(`Server running on port ${PORT}`);
-});
+    console.log(`Server is running on port ${Env.PORT} in  ${Env.NODE_ENV} mode`);
+})
