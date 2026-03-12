@@ -12,7 +12,6 @@ import { errorHandler } from "./middlewares/errorHandler.middleware";
 
 const app = express();
 const server = http.createServer(app);
-//Socket
 
 app.use(express.json({ limit: "10MB" }));
 app.use(express.urlencoded({ extended: true }));
