@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-
-const connectDB = async () => {
+import mongoose from "mongoose";
+const connectDatabase = async () => {
     try {
         // في النسخ الجديدة من Mongoose، مجرد تمرير URI كفاية
         await mongoose.connect(process.env.MONGO_URI);
@@ -11,4 +10,4 @@ const connectDB = async () => {
     }
 };
 
-module.exports = connectDB;
+export default connectDatabase;
