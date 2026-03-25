@@ -13,9 +13,6 @@ const swaggerSpec = require("./src/config/swagger");
 const authRoutes =
   require("./src/routes/auth.routes");
 
-const doctorRoutes =
-  require("./src/routes/doctor.routes");
-
 const appointmentRoutes =
   require("./src/routes/appointment.routes");
 
@@ -80,12 +77,6 @@ app.use(
 app.use(
   "/api/auth",
   authRoutes
-);
-
-// Doctors
-app.use(
-  "/api/doctors",
-  doctorRoutes
 );
 
 // Appointments
