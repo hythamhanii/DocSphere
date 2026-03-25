@@ -1,10 +1,24 @@
 const Review = require("../models/review.model");
+const {
+  findDoctorProfileByIdOrUserId
+} = require("../utils/doctorProfile");
 
 exports.createReview = async (req, res) => {
   try {
+    const doctorProfile =
+      await findDoctorProfileByIdOrUserId(
+        req.body.doctor
+      );
+
+    if (!doctorProfile) {
+      return res.status(400).json({
+        message: "Doctor profile not found"
+      });
+    }
+
     const review = await Review.create({
       patient: req.user._id,
-      doctor: req.body.doctor,
+      doctor: doctorProfile._id,
       rating: req.body.rating,
       comment: req.body.comment
     });
@@ -20,8 +34,17 @@ exports.createReview = async (req, res) => {
 
 exports.getDoctorReviews = async (req, res) => {
   try {
+    const doctorProfile =
+      await findDoctorProfileByIdOrUserId(
+        req.params.doctorId
+      );
+
+    if (!doctorProfile) {
+      return res.json([]);
+    }
+
     const reviews = await Review.find({
-      doctor: req.params.doctorId
+      doctor: doctorProfile._id
     }).populate("patient");
 
     res.json(reviews);

@@ -1,4 +1,3 @@
-const Doctor = require("../models/doctorProfile.model");
 const User = require("../models/user.model");
 const Appointment = require("../models/appointment.model");
 const Service = require("../models/service.model");
@@ -7,7 +6,9 @@ const Payment = require("../models/payment.model");
 exports.getAdminStats = async (req, res) => {
   try {
     const totalDoctors =
-      await Doctor.countDocuments();
+      await User.countDocuments({
+        role: "doctor"
+      });
 
     const totalPatients =
       await User.countDocuments({

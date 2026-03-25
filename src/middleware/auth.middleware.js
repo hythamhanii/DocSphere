@@ -5,7 +5,12 @@ const protect = async (req, res, next) => {
   let token;
 
   if (req.headers.authorization) {
-    token = req.headers.authorization;
+    const authHeader =
+      req.headers.authorization.trim();
+
+    token = authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : authHeader;
   }
 
   if (!token) {

@@ -1,11 +1,27 @@
 const Appointment =
   require("../models/appointment.model");
+const {
+  findDoctorProfileByIdOrUserId
+} = require("../utils/doctorProfile");
 
 exports.getDoctorStats =
   async (req, res) => {
     try {
+      const doctorProfile =
+        await findDoctorProfileByIdOrUserId(
+          req.user._id
+        );
+
+      if (!doctorProfile) {
+        return res.json({
+          totalAppointments: 0,
+          pendingAppointments: 0,
+          completedAppointments: 0
+        });
+      }
+
       const doctorId =
-        req.user._id;
+        doctorProfile._id;
 
       const totalAppointments =
         await Appointment.countDocuments({
@@ -40,9 +56,18 @@ exports.getDoctorStats =
 exports.getDoctorAppointments =
   async (req, res) => {
     try {
+      const doctorProfile =
+        await findDoctorProfileByIdOrUserId(
+          req.user._id
+        );
+
+      if (!doctorProfile) {
+        return res.json([]);
+      }
+
       const appointments =
         await Appointment.find({
-          doctor: req.user._id
+          doctor: doctorProfile._id
         })
           .populate("patient")
           .populate("service")
@@ -62,14 +87,34 @@ exports.getDoctorAppointments =
 exports.updateAppointmentStatus =
   async (req, res) => {
     try {
+      const doctorProfile =
+        await findDoctorProfileByIdOrUserId(
+          req.user._id
+        );
+
+      if (!doctorProfile) {
+        return res.status(404).json({
+          message: "Doctor profile not found"
+        });
+      }
+
       const appointment =
-        await Appointment.findByIdAndUpdate(
-          req.params.id,
+        await Appointment.findOneAndUpdate(
+          {
+            _id: req.params.id,
+            doctor: doctorProfile._id
+          },
           {
             status: req.body.status
           },
           { new: true }
         );
+
+      if (!appointment) {
+        return res.status(404).json({
+          message: "Appointment not found"
+        });
+      }
 
       res.json(appointment);
 

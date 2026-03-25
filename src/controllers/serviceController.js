@@ -1,9 +1,32 @@
 const Service = require("../models/service.model");
+const {
+  findDoctorProfileByIdOrUserId,
+  findOrCreateDoctorProfileForUser
+} = require("../utils/doctorProfile");
 
 exports.createService = async (req, res) => {
   try {
+    const doctorProfile =
+      req.user?.role === "doctor"
+        ? await findOrCreateDoctorProfileForUser(
+            req.user._id,
+            {
+              consultationFee:
+                req.body.price
+            }
+          )
+        : await findDoctorProfileByIdOrUserId(
+            req.body.doctor
+          );
+
+    if (!doctorProfile) {
+      return res.status(400).json({
+        message: "Doctor profile not found"
+      });
+    }
+
     const service = await Service.create({
-      doctor: req.body.doctor,
+      doctor: doctorProfile._id,
       name: req.body.name,
       description: req.body.description,
       price: req.body.price,
@@ -22,7 +45,12 @@ exports.createService = async (req, res) => {
 exports.getServices = async (req, res) => {
   try {
     const services = await Service.find()
-      .populate("doctor");
+      .populate({
+        path: "doctor",
+        populate: {
+          path: "user specialization"
+        }
+      });
 
     res.json(services);
 
