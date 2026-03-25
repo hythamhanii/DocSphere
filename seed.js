@@ -7,6 +7,7 @@ const Specialization = require("./src/models/specialization.model");
 const Service = require("./src/models/service.model");
 const Appointment = require("./src/models/appointment.model");
 const Payment = require("./src/models/payment.model");
+const Review = require("./src/models/review.model");
 
 const connectDB = async () => {
   await mongoose.connect(process.env.MONGO_URI);
@@ -21,6 +22,7 @@ const seedData = async () => {
 
     await connectDB();
 
+    await Review.deleteMany({});
     await Payment.deleteMany({});
     await Appointment.deleteMany({});
     await Service.deleteMany({});
@@ -341,6 +343,71 @@ const seedData = async () => {
 
     console.log("5 payments created");
 
+    const reviews = await Review.insertMany([
+      {
+        patient: patientUsers[0]._id,
+        doctor: doctorProfiles[0]._id,
+        rating: 5,
+        comment: "Excellent cardiologist! Very thorough and professional. Highly recommended!"
+      },
+      {
+        patient: patientUsers[1]._id,
+        doctor: doctorProfiles[1]._id,
+        rating: 4,
+        comment: "Great dental service. The staff was friendly and professional."
+      },
+      {
+        patient: patientUsers[2]._id,
+        doctor: doctorProfiles[2]._id,
+        rating: 5,
+        comment: "Amazing dermatologist! Fixed my skin issues. Very knowledgeable."
+      },
+      {
+        patient: patientUsers[3]._id,
+        doctor: doctorProfiles[3]._id,
+        rating: 4,
+        comment: "Good orthopedic specialist. Gave me helpful exercises for my knee pain."
+      },
+      {
+        patient: patientUsers[4]._id,
+        doctor: doctorProfiles[4]._id,
+        rating: 5,
+        comment: "Wonderful pediatrician! Very caring with children. Highly recommended for parents."
+      },
+      {
+        patient: patientUsers[0]._id,
+        doctor: doctorProfiles[1]._id,
+        rating: 4,
+        comment: "Good experience at the dental clinic."
+      },
+      {
+        patient: patientUsers[1]._id,
+        doctor: doctorProfiles[2]._id,
+        rating: 5,
+        comment: "Perfect service! Very satisfied."
+      },
+      {
+        patient: patientUsers[2]._id,
+        doctor: doctorProfiles[3]._id,
+        rating: 3,
+        comment: "Average experience. Could have been better."
+      },
+      {
+        patient: patientUsers[3]._id,
+        doctor: doctorProfiles[4]._id,
+        rating: 5,
+        comment: "Excellent care for my child!"
+      },
+      {
+        patient: patientUsers[4]._id,
+        doctor: doctorProfiles[0]._id,
+        rating: 4,
+        comment: "Very professional and helpful doctor."
+      }
+    ]);
+
+    console.log("10 reviews created");
+
     console.log("\n=== Seed completed successfully ===");
     console.log("Created:");
     console.log("- users: 15");
@@ -349,6 +416,7 @@ const seedData = async () => {
     console.log("- services: 5");
     console.log("- appointments: 5");
     console.log("- payments: 5");
+    console.log("- reviews: 10");
 
     console.log("\nDoctor accounts:");
     doctorUsers.forEach((user, index) => {
@@ -399,6 +467,12 @@ const seedData = async () => {
     payments.forEach((item, index) => {
       console.log(
         `Payment ${index + 1}: ${item._id.toString()}`
+      );
+    });
+
+    reviews.forEach((item, index) => {
+      console.log(
+        `Review ${index + 1}: ${item._id.toString()}`
       );
     });
 
