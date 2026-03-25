@@ -1,94 +1,130 @@
 {
   "info": {
     "_postman_id": "b5a1d5f0-3e19-4b4c-a7ec-6c5d2c7f1a01",
-    "name": "DocSphere Backend",
-    "description": "Postman collection for testing the DocSphere backend with seeded sample accounts and IDs.",
+    "name": "DocSphere Backend - Complete API Testing",
+    "description": "Complete Postman collection for testing all DocSphere backend features. Follow the Quick Start guide for the easiest workflow.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:5000"
+      "value": "http://localhost:5000",
+      "type": "string"
     },
     {
-      "key": "token",
-      "value": ""
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "doctorToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "patientToken",
+      "value": "",
+      "type": "string"
     },
     {
       "key": "doctorId",
-      "value": ""
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "doctorProfileId",
+      "value": "",
+      "type": "string"
     },
     {
       "key": "appointmentId",
-      "value": ""
-    },
-    {
-      "key": "specializationId",
-      "value": ""
+      "value": "",
+      "type": "string"
     },
     {
       "key": "serviceId",
-      "value": ""
+      "value": "",
+      "type": "string"
     },
     {
-      "key": "serviceDeleteId",
-      "value": ""
+      "key": "paymentId",
+      "value": "",
+      "type": "string"
     },
     {
-      "key": "patientEmail",
-      "value": "patient1@docsphere.com"
+      "key": "specializationId",
+      "value": "",
+      "type": "string"
     },
     {
-      "key": "doctorEmail",
-      "value": "doctor1@docsphere.com"
-    },
-    {
-      "key": "adminEmail",
-      "value": "admin1@docsphere.com"
-    },
-    {
-      "key": "defaultPassword",
-      "value": "123456"
+      "key": "reviewId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
     {
-      "name": "00 - Quick Start",
-      "description": "Recommended order: 1) run node seed.js, 2) login as doctor/admin/patient using the requests below, 3) paste IDs from seed output into collection variables, 4) test all endpoints.",
+      "name": "📚 Quick Start Guide",
+      "description": "Start here! Follow these steps to test everything:",
       "item": [
         {
-          "name": "Swagger Docs",
+          "name": "1️⃣ Step 1 - Seed Database",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/docs",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "docs"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "docs"]
             },
-            "description": "Open Swagger UI documentation."
+            "description": "⚠️ IMPORTANT: Before running any tests:\n\n**In your terminal, run:**\n```\nnode seed.js\n```\n\nThis will create sample users and data in your database.\n\nThen come back to Postman and click 'Send' on the next steps."
+          }
+        },
+        {
+          "name": "2️⃣ Step 2 - Login All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/docs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "docs"]
+            },
+            "description": "Run these login requests in order to get tokens for all roles:\n\n1. Go to 'Authentication' folder\n2. Click 'Login as Admin 1'\n3. Click 'Login as Doctor 1'\n4. Click 'Login as Patient 1'\n\nThe tokens will be automatically saved to variables (adminToken, doctorToken, patientToken)"
+          }
+        },
+        {
+          "name": "3️⃣ Step 3 - Run Test Collections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/docs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "docs"]
+            },
+            "description": "Now you can test all features:\n\n✅ **Use the Runner feature:**\n1. Click 'Runner' button in Postman\n2. Select this collection\n3. Click 'Run'\n4. Watch all tests execute automatically\n\n✅ **Or test manually:**\n- Follow the folder structure (Specializations → Services → Appointments → Payments → Reviews → Dashboards)\n- Copy-paste IDs from responses into variables when needed\n- Check 'Pre-request Script' and 'Tests' tabs for automatic variable extraction"
           }
         }
       ]
     },
     {
-      "name": "01 - Seeded Logins",
-      "description": "These are the easiest login requests to use after running node seed.js.",
+      "name": "🔐 Authentication",
+      "description": "Login requests with automatic token extraction. Run these first!",
       "item": [
         {
-          "name": "Login as Doctor 1",
+          "name": "Register Admin",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const jsonData = pm.response.json();",
-                  "if (jsonData.token) pm.collectionVariables.set('token', jsonData.token);"
+                  "if (pm.response.code === 201) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('adminToken', jsonData.token);",
+                  "  console.log('✅ Admin registered and token saved');",
+                  "}"
                 ]
               }
             }
@@ -103,32 +139,30 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{doctorEmail}}\",\n  \"password\": \"{{defaultPassword}}\"\n}"
+              "raw": "{\n  \"firstName\": \"Admin\",\n  \"lastName\": \"TestUser\",\n  \"email\": \"admintest@docsphere.com\",\n  \"password\": \"123456\",\n  \"role\": \"admin\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
             },
-            "description": "Logs in doctor1@docsphere.com and saves token to {{token}}."
+            "description": "Register a new admin account"
           }
         },
         {
-          "name": "Login as Patient 1",
+          "name": "Register Doctor",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const jsonData = pm.response.json();",
-                  "if (jsonData.token) pm.collectionVariables.set('token', jsonData.token);"
+                  "if (pm.response.code === 201) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('doctorToken', jsonData.token);",
+                  "  pm.collectionVariables.set('doctorId', jsonData.user._id);",
+                  "  console.log('✅ Doctor registered and token saved');",
+                  "}"
                 ]
               }
             }
@@ -143,20 +177,51 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{patientEmail}}\",\n  \"password\": \"{{defaultPassword}}\"\n}"
+              "raw": "{\n  \"firstName\": \"Doctor\",\n  \"lastName\": \"TestUser\",\n  \"email\": \"doctortest@docsphere.com\",\n  \"password\": \"123456\",\n  \"role\": \"doctor\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
             },
-            "description": "Logs in patient1@docsphere.com and saves token to {{token}}."
+            "description": "Register a new doctor account"
+          }
+        },
+        {
+          "name": "Register Patient",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('patientToken', jsonData.token);",
+                  "  console.log('✅ Patient registered and token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Patient\",\n  \"lastName\": \"TestUser\",\n  \"email\": \"patienttest@docsphere.com\",\n  \"password\": \"123456\",\n  \"role\": \"patient\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new patient account"
           }
         },
         {
@@ -167,8 +232,13 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const jsonData = pm.response.json();",
-                  "if (jsonData.token) pm.collectionVariables.set('token', jsonData.token);"
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('adminToken', jsonData.token);",
+                  "  console.log('✅ Logged in as Admin - Token saved to adminToken');",
+                  "} else {",
+                  "  console.log('❌ Login failed. Make sure to run: node seed.js');",
+                  "}"
                 ]
               }
             }
@@ -183,118 +253,33 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{defaultPassword}}\"\n}"
+              "raw": "{\n  \"email\": \"admin1@docsphere.com\",\n  \"password\": \"123456\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
             },
-            "description": "Logs in admin1@docsphere.com and saves token to {{token}}."
-          }
-        }
-      ]
-    },
-    {
-      "name": "02 - Auth",
-      "item": [
-        {
-          "name": "Register Patient",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Ali\",\n  \"lastName\": \"Hassan\",\n  \"email\": \"patient@example.com\",\n  \"password\": \"123456\",\n  \"role\": \"patient\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "register"
-              ]
-            }
+            "description": "Login with seeded admin account (from seed.js)"
           }
         },
         {
-          "name": "Register Doctor",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Sara\",\n  \"lastName\": \"Mahmoud\",\n  \"email\": \"doctor@example.com\",\n  \"password\": \"123456\",\n  \"role\": \"doctor\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "register"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Register Admin",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"123456\",\n  \"role\": \"admin\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "register"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Login",
+          "name": "Login as Doctor 1",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const jsonData = pm.response.json();",
-                  "if (jsonData.token) pm.collectionVariables.set('token', jsonData.token);"
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('doctorToken', jsonData.token);",
+                  "  pm.collectionVariables.set('doctorId', jsonData.user._id);",
+                  "  console.log('✅ Logged in as Doctor - Token saved to doctorToken');",
+                  "  console.log('✅ Doctor ID saved to doctorId');",
+                  "} else {",
+                  "  console.log('❌ Login failed. Make sure to run: node seed.js');",
+                  "}"
                 ]
               }
             }
@@ -309,30 +294,108 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"patient@example.com\",\n  \"password\": \"123456\"\n}"
+              "raw": "{\n  \"email\": \"doctor1@docsphere.com\",\n  \"password\": \"123456\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
             },
-            "description": "Generic login request. Saves returned token to {{token}}."
+            "description": "Login with seeded doctor account (from seed.js)"
+          }
+        },
+        {
+          "name": "Login as Patient 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('patientToken', jsonData.token);",
+                  "  console.log('✅ Logged in as Patient - Token saved to patientToken');",
+                  "} else {",
+                  "  console.log('❌ Login failed. Make sure to run: node seed.js');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patient1@docsphere.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with seeded patient account (from seed.js)"
           }
         }
       ]
     },
     {
-      "name": "03 - Specializations",
-      "description": "These routes exist in the codebase, but they are not mounted in server.js yet. They will work only after you mount the routes in the Express app.",
+      "name": "🏥 Specializations",
+      "description": "Manage specializations (Cardiology, Dentistry, etc.)",
       "item": [
+        {
+          "name": "Get All Specializations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  if (jsonData.length > 0) {",
+                  "    pm.collectionVariables.set('specializationId', jsonData[0]._id);",
+                  "    console.log('✅ Got specializations. ID saved: ' + jsonData[0]._id);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/specializations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "specializations"]
+            },
+            "description": "Get all medical specializations"
+          }
+        },
         {
           "name": "Create Specialization",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('specializationId', jsonData._id);",
+                  "  console.log('✅ Specialization created with ID: ' + jsonData._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -343,115 +406,69 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Neurology\",\n  \"description\": \"Brain and nervous system care\"\n}"
+              "raw": "{\n  \"name\": \"Neurology\",\n  \"description\": \"Brain and nervous system disorders\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/specializations",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "specializations"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "specializations"]
             },
-            "description": "Not mounted in server.js yet."
-          }
-        },
-        {
-          "name": "Get Specializations",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/api/specializations",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "specializations"
-              ]
-            },
-            "description": "Not mounted in server.js yet."
+            "description": "Create a new medical specialization"
           }
         }
       ]
     },
     {
-      "name": "04 - Doctors",
+      "name": "💼 Services",
+      "description": "Services offered by doctors",
       "item": [
         {
-          "name": "Create Doctor Profile",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
+          "name": "Get All Services",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  if (jsonData.length > 0) {",
+                  "    pm.collectionVariables.set('serviceId', jsonData[0]._id);",
+                  "    console.log('✅ Got services. First service ID saved: ' + jsonData[0]._id);",
+                  "  }",
+                  "}"
+                ]
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bio\": \"Cardiologist with 10 years of experience\",\n  \"clinicAddress\": \"Cairo, Nasr City\",\n  \"consultationFee\": 500,\n  \"experienceYears\": 10\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/doctors",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "doctors"
-              ]
-            },
-            "description": "Use Login as Doctor 1 first. specialization was removed from the default body because it must be a real MongoDB ObjectId if provided."
-          }
-        },
-        {
-          "name": "Get All Doctors",
+            }
+          ],
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/doctors",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "doctors"
-              ]
-            }
+              "raw": "{{baseUrl}}/api/services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "services"]
+            },
+            "description": "Get all available services"
           }
         },
-        {
-          "name": "Get Doctor By Id",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "doctors",
-                "{{doctorId}}"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "05 - Services",
-      "description": "These routes exist in the codebase, but they are not mounted in server.js yet. They will work only after you mount the routes in the Express app.",
-      "item": [
         {
           "name": "Create Service",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('serviceId', jsonData._id);",
+                  "  console.log('✅ Service created with ID: ' + jsonData._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -461,41 +478,19 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{doctorToken}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"doctor\": \"{{doctorId}}\",\n  \"name\": \"General Consultation\",\n  \"description\": \"Doctor consultation and diagnosis\",\n  \"price\": 500,\n  \"duration\": 30\n}"
+              "raw": "{\n  \"name\": \"General Consultation\",\n  \"description\": \"One-on-one consultation with the doctor\",\n  \"price\": 500,\n  \"duration\": 30\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/services",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "services"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "services"]
             },
-            "description": "Use Login as Doctor 1 first. Not mounted in server.js yet."
-          }
-        },
-        {
-          "name": "Get Services",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/api/services",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "services"
-              ]
-            },
-            "description": "Not mounted in server.js yet."
+            "description": "Create a new service (requires doctor login)"
           }
         },
         {
@@ -505,30 +500,40 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{doctorToken}}"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/services/{{serviceDeleteId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "services",
-                "{{serviceDeleteId}}"
-              ]
+              "raw": "{{baseUrl}}/api/services/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "services", "{{serviceId}}"]
             },
-            "description": "Use a real service id in {{serviceDeleteId}}. Not mounted in server.js yet."
+            "description": "Delete a service (use serviceId from 'Create Service')"
           }
         }
       ]
     },
     {
-      "name": "06 - Appointments",
+      "name": "📅 Appointments",
+      "description": "Patients book appointments with doctors",
       "item": [
         {
           "name": "Create Appointment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('appointmentId', jsonData._id);",
+                  "  console.log('✅ Appointment created with ID: ' + jsonData._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -538,48 +543,51 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{patientToken}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"doctor\": \"{{doctorId}}\",\n  \"appointmentDate\": \"2026-03-30T10:00:00.000Z\",\n  \"notes\": \"First consultation\"\n}"
+              "raw": "{\n  \"doctor\": \"{{doctorId}}\",\n  \"appointmentDate\": \"2026-04-01T10:00:00.000Z\",\n  \"notes\": \"Initial consultation needed\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/appointments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "appointments"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "appointments"]
             },
-            "description": "Use Login as Patient 1 first. service was removed from the default body because it must be a real MongoDB ObjectId if provided."
+            "description": "Create an appointment (requires patient login)"
           }
         },
         {
-          "name": "Get My Appointments",
+          "name": "Get My Appointments (Patient)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Retrieved ' + jsonData.length + ' appointments');",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{patientToken}}"
               }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/appointments/my",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "appointments",
-                "my"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "appointments", "my"]
             },
-            "description": "Use Login as Patient 1 first."
+            "description": "Get all appointments for logged-in patient"
           }
         },
         {
@@ -593,7 +601,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{patientToken}}"
               }
             ],
             "body": {
@@ -602,26 +610,36 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/appointments/{{appointmentId}}/status",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "appointments",
-                "{{appointmentId}}",
-                "status"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "appointments", "{{appointmentId}}", "status"]
             },
-            "description": "Allowed status values: pending, confirmed, cancelled, completed."
+            "description": "Update appointment status (pending, confirmed, cancelled, completed)"
           }
         }
       ]
     },
     {
-      "name": "07 - Payments",
+      "name": "💳 Payments",
+      "description": "Process payments for appointments",
       "item": [
         {
           "name": "Create Payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('paymentId', jsonData._id);",
+                  "  console.log('✅ Payment created with ID: ' + jsonData._id);",
+                  "  console.log('   Transaction ID: ' + jsonData.transactionId);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -631,76 +649,632 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{patientToken}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"appointment\": \"{{appointmentId}}\",\n  \"amount\": 500,\n  \"method\": \"cash\"\n}"
+              "raw": "{\n  \"appointment\": \"{{appointmentId}}\",\n  \"amount\": 500,\n  \"method\": \"card\",\n  \"transactionId\": \"TXN-001-2026\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/payments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "payments"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
             },
-            "description": "Use Login as Patient 1 first. Allowed payment methods: cash, card, online."
+            "description": "Create a payment (requires patient login)\nMethods: cash, card, online"
           }
         },
         {
-          "name": "Get Payments",
+          "name": "Get All Payments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Retrieved ' + jsonData.length + ' payments');",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{patientToken}}"
               }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/payments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "payments"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
             },
-            "description": "Use any logged-in account."
+            "description": "Get all payments (requires authentication)"
           }
         }
       ]
     },
     {
-      "name": "08 - Dashboard",
+      "name": "⭐ Reviews",
+      "description": "Patients leave reviews for doctors",
       "item": [
         {
-          "name": "Get Dashboard Stats",
+          "name": "Create Review",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.collectionVariables.set('reviewId', jsonData._id);",
+                  "  console.log('✅ Review created with ID: ' + jsonData._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctor\": \"{{doctorId}}\",\n  \"rating\": 5,\n  \"comment\": \"Excellent doctor! Very professional and helpful.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews"]
+            },
+            "description": "Create a review for a doctor (requires patient login)\nRating: 1-5"
+          }
+        },
+        {
+          "name": "Get Doctor Reviews",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Retrieved ' + jsonData.length + ' reviews for this doctor');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "{{doctorId}}"]
+            },
+            "description": "Get all reviews for a specific doctor"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Admin Dashboard",
+      "description": "Admin-only dashboard endpoints",
+      "item": [
+        {
+          "name": "Get Admin Stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Admin Stats Retrieved:');",
+                  "  console.log('   Total Patients: ' + jsonData.totalPatients);",
+                  "  console.log('   Total Doctors: ' + jsonData.totalDoctors);",
+                  "  console.log('   Total Appointments: ' + jsonData.totalAppointments);",
+                  "  console.log('   Total Payments: ' + jsonData.totalPayments);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/dashboard/stats",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "dashboard",
-                "stats"
-              ]
+              "raw": "{{baseUrl}}/api/dashboard/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "admin", "stats"]
             },
-            "description": "Use Login as Admin 1 first."
+            "description": "Get overall platform statistics (admin only)"
+          }
+        },
+        {
+          "name": "Get Recent Appointments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Retrieved ' + jsonData.length + ' recent appointments');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/admin/recent-appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "admin", "recent-appointments"]
+            },
+            "description": "Get 5 most recent appointments (admin only)"
+          }
+        },
+        {
+          "name": "Get Recent Payments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Retrieved ' + jsonData.length + ' recent payments');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/admin/recent-payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "admin", "recent-payments"]
+            },
+            "description": "Get 5 most recent payments (admin only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "👨‍⚕️ Doctor Dashboard",
+      "description": "Doctor-only dashboard endpoints",
+      "item": [
+        {
+          "name": "Get Doctor Stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Doctor Stats Retrieved:');",
+                  "  console.log('   Total Appointments: ' + jsonData.totalAppointments);",
+                  "  console.log('   Completed Appointments: ' + jsonData.completedAppointments);",
+                  "  console.log('   Pending Appointments: ' + jsonData.pendingAppointments);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/doctor/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "doctor", "stats"]
+            },
+            "description": "Get doctor's appointment statistics (doctor only)"
+          }
+        },
+        {
+          "name": "Get Doctor Appointments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Retrieved ' + jsonData.length + ' appointments');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/doctor/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "doctor", "appointments"]
+            },
+            "description": "Get all appointments for the logged-in doctor (doctor only)"
+          }
+        },
+        {
+          "name": "Update Appointment Status (Doctor)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/doctor/appointments/{{appointmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "doctor", "appointments", "{{appointmentId}}"]
+            },
+            "description": "Update appointment status (doctor only)\nStatus: pending, confirmed, cancelled, completed"
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Patient Dashboard",
+      "description": "Patient-only dashboard endpoints",
+      "item": [
+        {
+          "name": "Get Patient Stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Patient Stats Retrieved:');",
+                  "  console.log('   Total Appointments: ' + jsonData.totalAppointments);",
+                  "  console.log('   Completed Appointments: ' + jsonData.completedAppointments);",
+                  "  console.log('   Upcoming Appointments: ' + jsonData.upcomingAppointments);",
+                  "  console.log('   My Payments: ' + jsonData.myPayments);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/patient/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "patient", "stats"]
+            },
+            "description": "Get patient's appointment and payment statistics (patient only)"
+          }
+        },
+        {
+          "name": "Get Patient Appointments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('✅ Retrieved ' + jsonData.length + ' appointments');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/patient/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "patient", "appointments"]
+            },
+            "description": "Get all appointments for the logged-in patient (patient only)"
+          }
+        },
+        {
+          "name": "Cancel Appointment (Patient)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/patient/appointments/{{appointmentId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "patient", "appointments", "{{appointmentId}}", "cancel"]
+            },
+            "description": "Cancel an appointment (patient only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Complete Test Flow",
+      "description": "A complete workflow to test everything in order",
+      "item": [
+        {
+          "name": "1. Get Specializations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/specializations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "specializations"]
+            }
+          }
+        },
+        {
+          "name": "2. Get Services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "services"]
+            }
+          }
+        },
+        {
+          "name": "3. Login as Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patient1@docsphere.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "4. Create Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctor\": \"{{doctorId}}\",\n  \"appointmentDate\": \"2026-04-05T14:00:00.000Z\",\n  \"notes\": \"Testing the complete flow\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "appointments"]
+            }
+          }
+        },
+        {
+          "name": "5. Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointment\": \"{{appointmentId}}\",\n  \"amount\": 500,\n  \"method\": \"card\",\n  \"transactionId\": \"TEST-TXN-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
+            }
+          }
+        },
+        {
+          "name": "6. Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctor\": \"{{doctorId}}\",\n  \"rating\": 5,\n  \"comment\": \"Great experience!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "7. Login as Doctor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doctor1@docsphere.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "8. Get Doctor Appointments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/doctor/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "doctor", "appointments"]
+            }
+          }
+        },
+        {
+          "name": "9. Login as Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin1@docsphere.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "10. Get Admin Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "admin", "stats"]
+            }
           }
         }
       ]
