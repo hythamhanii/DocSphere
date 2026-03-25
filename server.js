@@ -22,6 +22,11 @@ const paymentRoutes =
 const serviceRoutes =
   require("./src/routes/service.routes");
 
+const specializationRoutes =
+  require(
+    "./src/routes/specialization.routes"
+  );
+
 const reviewRoutes =
   require("./src/routes/review.routes");
 
@@ -95,6 +100,12 @@ app.use(
 app.use(
   "/api/services",
   serviceRoutes
+);
+
+// Specializations
+app.use(
+  "/api/specializations",
+  specializationRoutes
 );
 
 // Reviews
