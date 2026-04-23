@@ -22,10 +22,14 @@ const protect = async (req, res, next) => {
   try {
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET
+      process.env.JWT_ACCESS_SECRET
     );
 
     req.user = await User.findById(decoded.id);
+
+    if (!req.user || req.user.isSuspended || req.user.isDeleted) {
+      return res.status(403).json({ message: "Account not allowed" });
+    }
 
     next();
   } catch (error) {
